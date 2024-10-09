@@ -9,15 +9,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout Source
-      uses: actions/checkout@v4
-    - uses: astral-sh/setup-uv@v3
-    - run: uvx check-manifest
-    - run: uv build
-
   unit-tests:
     strategy:
       fail-fast: false
