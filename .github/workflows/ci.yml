@@ -1,0 +1,53 @@
+name: CI
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  # auto-cancel any in-progress job *on the same branch*
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v3
+    - run: uvx check-manifest
+    - run: uv build
+
+  unit-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - os: ubuntu-latest
+          python-version: '3.13'
+          venv-loc: bin
+        - os: windows-latest
+          python-version: '3.12'
+          venv-loc: Scripts
+        - os: windows-latest
+          python-version: '3.13'
+          venv-loc: Scripts
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v3
+
+    - name: Build
+      run: |
+        uv venv --python ${{ matrix.python-version }}
+        uv pip install -r test_requirements.txt
+
+    - run: uv pip list
+
+    - name: Test
+      shell: bash
+      run: |
+        source .venv/${{matrix.venv-loc}}/activate
+        pytest --color=yes -ra

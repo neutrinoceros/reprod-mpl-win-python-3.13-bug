@@ -1,0 +1,14 @@
+[project]
+name = "reprod-mpl-win-python-3-13-bug"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { email = "cr52@protonmail.com" } 
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
