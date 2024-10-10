@@ -16,26 +16,65 @@ jobs:
         include:
         - os: ubuntu-latest
           python-version: '3.13'
+          use-uv: false
+        - os: ubuntu-latest
+          python-version: '3.13'
+          use-uv: true
+          venv-loc: bin
         - os: windows-latest
           python-version: '3.12'
+          use-uv: false
+        - os: windows-latest
+          python-version: '3.12'
+          use-uv: true
+          venv-loc: Scripts
         - os: windows-latest
           python-version: '3.13'
+          use-uv: false
+        - os: windows-latest
+          python-version: '3.13'
+          use-uv: true
+          venv-loc: Scripts
 
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout Source
       uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+
+    - if: !matrix.use-uv
+      uses: actions/setup-python@v5
       with:
         python-version: ${{matrix.python-version}}
 
-    - name: Build
+    - if: matrix.use-uv
+      uses: astral-sh/setup-uv@v3
+
+    - name: Build (pip)
+      if: !matrix.use-uv
       run: |
         pip install -r test_requirements.txt
 
-    - run: pip list
+    - name: Build (uv)
+      if: matrix.use-uv
+      run: |
+        uv venv --python=${{matrix.python-version}} --python-preference=only-managed
+        uv pip install -r test_requirements.txt
 
-    - name: Test
+    - if: !matrix.use-uv
+      run: pip list
+    
+    - if: matrix.use-uv
+      run: uv pip list
+
+    - name: Test (pip)
+      if: !matrix.use-uv
       shell: bash
       run: |
+        pytest --color=yes -ra
+
+    - name: Test (uv)
+      if: !matrix.use-uv
+      shell: bash
+      run: |
+        source .venv/${{matrix.venv-loc}}/activate
         pytest --color=yes -ra
