@@ -28,11 +28,14 @@ jobs:
     steps:
     - name: Checkout Source
       uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{matrix.python-version}}
     - uses: astral-sh/setup-uv@v3
 
     - name: Build
       run: |
-        uv venv --python ${{ matrix.python-version }}
+        uv venv --python ${{ matrix.python-version }} --python-preference only-system
         uv pip install -r test_requirements.txt
 
     - run: uv pip list
