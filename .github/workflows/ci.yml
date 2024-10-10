@@ -16,13 +16,10 @@ jobs:
         include:
         - os: ubuntu-latest
           python-version: '3.13'
-          venv-loc: bin
         - os: windows-latest
           python-version: '3.12'
-          venv-loc: Scripts
         - os: windows-latest
           python-version: '3.13'
-          venv-loc: Scripts
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -31,17 +28,14 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: ${{matrix.python-version}}
-    - uses: astral-sh/setup-uv@v3
 
     - name: Build
       run: |
-        uv venv --python ${{ matrix.python-version }} --python-preference only-system
-        uv pip install -r test_requirements.txt
+        pip install -r test_requirements.txt
 
-    - run: uv pip list
+    - run: pip list
 
     - name: Test
       shell: bash
       run: |
-        source .venv/${{matrix.venv-loc}}/activate
         pytest --color=yes -ra
