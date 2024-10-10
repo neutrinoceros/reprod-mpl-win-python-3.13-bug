@@ -41,7 +41,7 @@ jobs:
     - name: Checkout Source
       uses: actions/checkout@v4
 
-    - if: !matrix.use-uv
+    - if: !(matrix.use-uv)
       uses: actions/setup-python@v5
       with:
         python-version: ${{matrix.python-version}}
@@ -50,7 +50,7 @@ jobs:
       uses: astral-sh/setup-uv@v3
 
     - name: Build (pip)
-      if: !matrix.use-uv
+      if: !(matrix.use-uv)
       run: |
         pip install -r test_requirements.txt
 
@@ -60,20 +60,20 @@ jobs:
         uv venv --python=${{matrix.python-version}} --python-preference=only-managed
         uv pip install -r test_requirements.txt
 
-    - if: !matrix.use-uv
+    - if: !(matrix.use-uv)
       run: pip list
     
     - if: matrix.use-uv
       run: uv pip list
 
     - name: Test (pip)
-      if: !matrix.use-uv
+      if: !(matrix.use-uv)
       shell: bash
       run: |
         pytest --color=yes -ra
 
     - name: Test (uv)
-      if: !matrix.use-uv
+      if: !(matrix.use-uv)
       shell: bash
       run: |
         source .venv/${{matrix.venv-loc}}/activate
