@@ -73,7 +73,7 @@ jobs:
         pytest --color=yes -ra
 
     - name: Test (uv)
-      if: ${{ ! matrix.use-uv }}
+      if: ${{ matrix.use-uv }}
       shell: bash
       run: |
         source .venv/${{matrix.venv-loc}}/activate
