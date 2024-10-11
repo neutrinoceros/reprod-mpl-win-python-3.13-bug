@@ -17,6 +17,7 @@ jobs:
         - os: ubuntu-latest
           python-version: '3.13'
           use-uv: false
+          venv-loc: bin
         - os: ubuntu-latest
           python-version: '3.13'
           use-uv: true
@@ -24,6 +25,7 @@ jobs:
         - os: windows-latest
           python-version: '3.12'
           use-uv: false
+          venv-loc: Scripts
         - os: windows-latest
           python-version: '3.12'
           use-uv: true
@@ -31,6 +33,7 @@ jobs:
         - os: windows-latest
           python-version: '3.13'
           use-uv: false
+          venv-loc: Scripts
         - os: windows-latest
           python-version: '3.13'
           use-uv: true
@@ -51,7 +54,10 @@ jobs:
 
     - name: Build (pip)
       if: ${{ ! matrix.use-uv }}
+      shell: bash
       run: |
+        python -m venv .venv
+        source .venv/${{matrix.venv-loc}}/activate
         pip install -r test_requirements.txt
 
     - name: Build (uv)
@@ -61,7 +67,10 @@ jobs:
         uv pip install -r test_requirements.txt
 
     - if: ${{ ! matrix.use-uv }}
-      run: pip list
+      shell: bash
+      run: |
+        source .venv/${{matrix.venv-loc}}/activate
+        pip list
     
     - if: matrix.use-uv
       run: uv pip list
@@ -70,6 +79,7 @@ jobs:
       if: ${{ ! matrix.use-uv }}
       shell: bash
       run: |
+        source .venv/${{matrix.venv-loc}}/activate
         pytest --color=yes -ra
 
     - name: Test (uv)
